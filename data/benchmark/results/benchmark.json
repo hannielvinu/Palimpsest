@@ -1,0 +1,232 @@
+{
+  "label": "Synthetic, self-generated; a blind human-tampered set is planned.",
+  "total": 20,
+  "caught": 9,
+  "missed": 1,
+  "genuine": 10,
+  "false_alarms": 0,
+  "cannot_determine": 0,
+  "per_detector": {
+    "arithmetic": {
+      "hits": 5,
+      "expected": 5,
+      "rate": 1.0
+    },
+    "font_baseline": {
+      "hits": 3,
+      "expected": 3,
+      "rate": 1.0
+    },
+    "hidden_text": {
+      "hits": 1,
+      "expected": 1,
+      "rate": 1.0
+    },
+    "layer_peel": {
+      "hits": 3,
+      "expected": 4,
+      "rate": 0.75
+    },
+    "salary_credit": {
+      "hits": 7,
+      "expected": 7,
+      "rate": 1.0
+    },
+    "signature_reuse": {
+      "hits": 1,
+      "expected": 1,
+      "rate": 1.0
+    }
+  },
+  "cases": [
+    {
+      "case": "case-01",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-02",
+      "kind": "revision",
+      "positive": true,
+      "flagged": true,
+      "concern": "HIGH",
+      "observed_detectors": [
+        "arithmetic",
+        "font_baseline",
+        "layer_peel",
+        "salary_credit"
+      ]
+    },
+    {
+      "case": "case-03",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-04",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-05",
+      "kind": "injection",
+      "positive": true,
+      "flagged": true,
+      "concern": "MODERATE",
+      "observed_detectors": [
+        "hidden_text"
+      ]
+    },
+    {
+      "case": "case-06",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-07",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-08",
+      "kind": "arithmetic",
+      "positive": true,
+      "flagged": true,
+      "concern": "MODERATE",
+      "observed_detectors": [
+        "arithmetic",
+        "salary_credit"
+      ]
+    },
+    {
+      "case": "case-09",
+      "kind": "revision",
+      "positive": true,
+      "flagged": true,
+      "concern": "HIGH",
+      "observed_detectors": [
+        "arithmetic",
+        "font_baseline",
+        "layer_peel",
+        "salary_credit"
+      ]
+    },
+    {
+      "case": "case-10",
+      "kind": "signature",
+      "positive": true,
+      "flagged": true,
+      "concern": "LOW",
+      "observed_detectors": [
+        "signature_reuse"
+      ]
+    },
+    {
+      "case": "case-11",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-12",
+      "kind": "flattened",
+      "positive": true,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-13",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-14",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-15",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-16",
+      "kind": "revision",
+      "positive": true,
+      "flagged": true,
+      "concern": "HIGH",
+      "observed_detectors": [
+        "arithmetic",
+        "font_baseline",
+        "layer_peel",
+        "salary_credit"
+      ]
+    },
+    {
+      "case": "case-17",
+      "kind": "arithmetic",
+      "positive": true,
+      "flagged": true,
+      "concern": "MODERATE",
+      "observed_detectors": [
+        "arithmetic",
+        "salary_credit"
+      ]
+    },
+    {
+      "case": "case-18",
+      "kind": "credit",
+      "positive": true,
+      "flagged": true,
+      "concern": "MODERATE",
+      "observed_detectors": [
+        "salary_credit"
+      ]
+    },
+    {
+      "case": "case-19",
+      "kind": "clean",
+      "positive": false,
+      "flagged": false,
+      "concern": "LOW",
+      "observed_detectors": []
+    },
+    {
+      "case": "case-20",
+      "kind": "credit",
+      "positive": true,
+      "flagged": true,
+      "concern": "MODERATE",
+      "observed_detectors": [
+        "salary_credit"
+      ]
+    }
+  ]
+}
