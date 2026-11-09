@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 240" role="img" aria-labelledby="title">
+  <title id="title">Palimpsest · Every document has a second layer.</title>
+  <rect width="980" height="240" rx="18" fill="#19212d"/>
+  <g transform="translate(56 54)">
+    <path d="M12 22h96v101H12z" fill="#293549" stroke="#d3b984" stroke-width="3" transform="rotate(-11 12 22)"/>
+    <path d="M6 6h76l22 23v91H6z" fill="#19212d" stroke="#f6f1e7" stroke-width="3"/>
+    <path d="M81 7v23h22M26 50h58M26 67h46M26 84h35" stroke="#d3b984" stroke-width="3" fill="none"/>
+  </g>
+  <text x="200" y="119" fill="#fffdf8" font-family="Fraunces,Georgia,serif" font-size="76" font-weight="700">Palimpsest</text>
+  <text x="205" y="164" fill="#e4d2aa" font-family="Inter,Arial,sans-serif" font-size="22" letter-spacing="2">DOCUMENT FORENSICS / INVESTIGATION DESK</text>
+</svg>
