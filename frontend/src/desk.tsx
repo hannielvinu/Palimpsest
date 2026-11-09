@@ -50,9 +50,11 @@ export function Viewer({doc, result, target, setTarget}: {doc: Doc; result: Resu
       {changes.map((change, i) => <div className="revision-values" key={i}><span><small>PRIOR TEXT</small>{change.before || '—'}</span><span><small>CURRENT TEXT</small>{change.current || '—'}</span></div>)}
     </div>}
     {heatmap && <p className="heatmap-note">Brighter areas show larger recompression residuals. This is a weak signal.</p>}
-    <div className={`raster ${peel ? 'split' : ''}`}>
-      {peel > 0 && <div><span className="raster-tag">Prior revision</span><Render doc={doc} page={page} revision={peel} overlays={[]} zoom={zoom}/></div>}
-      <div>{peel > 0 && <span className="raster-tag">Current file</span>}<Render doc={doc} page={page} revision={0} overlays={overlays} zoom={zoom} heatmap={heatmap}/></div>
+    <div className={`raster ${peel ? 'split' : ''}`} role="region" aria-label="Scrollable document pages" tabIndex={0}>
+      {peel > 0 && <div role="region" aria-label="Prior revision page" tabIndex={0}><span className="raster-tag">Prior revision</span><Render doc={doc} page={page} revision={peel} overlays={[]} zoom={zoom}/></div>}
+      <div role={peel ? 'region' : undefined} aria-label={peel ? 'Current document page' : undefined} tabIndex={peel ? 0 : undefined}>
+        {peel > 0 && <span className="raster-tag">Current file</span>}<Render doc={doc} page={page} revision={0} overlays={overlays} zoom={zoom} heatmap={heatmap}/>
+      </div>
     </div>
     <fieldset className="layers"><legend>Overlay layers</legend>{layers.map(([key,title]) =>
       <label key={key}><input type="checkbox" checked={enabled.has(key)} onChange={() => setEnabled(prev => {
