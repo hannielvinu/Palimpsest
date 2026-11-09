@@ -88,14 +88,14 @@ function App() {
     catch(err) {setError((err as Error).message)}
     finally {setLoading('')}
   }
-  async function upload(files: FileList | null) {
-    if (!files?.length) return
+  async function upload(files: File[]) {
+    if (!files.length) return
     setLoading('upload');setError('')
     let id: string | undefined
     try {
       id = (await api<{id:string}>('/api/cases',post({title:'Uploaded synthetic records'}))).id
       const data = new FormData()
-      for (const file of Array.from(files)) data.append('files',file)
+      for (const file of files) data.append('files',file)
       await api(`/api/cases/${id}/documents`,post(data))
       await api(`/api/cases/${id}/analyze`,post())
       open(id)
@@ -137,7 +137,7 @@ function App() {
         </section>
         <section className="upload panel"><div><h2>Start with your own synthetic files</h2><p>PDF, PNG or JPG · Up to eight documents · 8 MiB each</p></div>
           {info?.demo_only ? <p>Uploads are available in the local edition.</p> : <label className="button primary file-button">{loading==='upload'?'Uploading…':'↑ Upload documents'}
-            <input type="file" multiple accept=".pdf,.png,.jpeg,.jpg" disabled={!!loading} onChange={e => {void upload(e.target.files);e.target.value=''}}/></label>}
+            <input type="file" multiple accept=".pdf,.png,.jpeg,.jpg" disabled={!!loading} onChange={e => {void upload(Array.from(e.target.files || []));e.target.value=''}}/></label>}
         </section>
       </>}
       {screen==='case' && <><div className="case-header"><div><small className="eyebrow">CASE FILE / {caseId.slice(0,8).toUpperCase()}</small>

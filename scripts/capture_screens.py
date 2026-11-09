@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from urllib.parse import urljoin
 
 from playwright.sync_api import expect, sync_playwright
 
@@ -97,6 +98,32 @@ def capture(page, out):
     assert page.evaluate("document.documentElement.scrollWidth") <= 391
 
 
+def verify_local_upload(page):
+    if page.request.get(urljoin(page.url, "/api/capabilities")).json()["demo_only"]:
+        return
+    page.set_viewport_size({"width":1440,"height":900})
+    fixtures = ROOT/"data"/"samples"/"meena_case"
+    page.locator("input[type=file]").set_input_files([fixtures/"01-salary-slip.png", fixtures/"02-bank-statement.pdf"])
+    expect(page.locator(".case-header .chip")).to_have_text("✓ LOW",timeout=40_000)
+    expect(page.locator(".doc-list .doc")).to_have_count(2)
+    page.get_by_label("Extracted fields").check()
+    assert page.locator(".box.fields").count() >= 4
+    page.get_by_role("button",name="Decision",exact=True).click()
+    page.get_by_role("button",name="Clear",exact=True).click()
+    expect(page.get_by_role("status")).to_contain_text("Audit entry recorded")
+    page.get_by_label("Reviewer note").fill("Synthetic workflow verification")
+    page.get_by_role("button",name="Escalate",exact=True).click()
+    expect(page.get_by_role("status")).to_contain_text("Escalate")
+    page.get_by_role("button",name="Audit trail",exact=True).click()
+    page.get_by_role("button",name="Verify chain").click()
+    expect(page.get_by_role("status")).to_contain_text("Verified")
+    expect(page.locator(".chain li strong").filter(has_text="Reviewer decision")).to_have_count(2)
+    page.get_by_role("button",name="Purge local case").click()
+    page.get_by_role("button",name="Confirm purge").click()
+    expect(page.get_by_role("heading",name="Open a sample case")).to_be_visible()
+    print("Local multipart upload, extracted-field overlays, Clear, Escalate, audit and purge verified.")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:7860")
@@ -111,6 +138,7 @@ def main():
         response = page.goto(args.url, wait_until="networkidle")
         assert response and response.ok
         capture(page,args.out)
+        verify_local_upload(page)
         assert not errors, errors
         print("Browser verified: four sample flows, focused evidence, PDF revisions, cross-matrix, reviewer decision, download, audit, benchmark, dark theme and mobile width.")
         browser.close()
