@@ -1,0 +1,15 @@
+.git
+.venv
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+frontend/dist
+.env*
+runtime
+.scratch
+docs
+presentation
+demo
+data/benchmark/inputs
+data/benchmark/blind
+data/benchmark/truth.json

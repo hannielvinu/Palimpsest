@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: palimpsest
+    runtime: docker
+    plan: free
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: PALIMPSEST_DEMO_ONLY
+        value: "1"
+      - key: PALIMPSEST_DATA
+        value: /tmp/palimpsest

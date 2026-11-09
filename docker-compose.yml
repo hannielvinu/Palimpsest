@@ -1,0 +1,14 @@
+services:
+  desk:
+    build: .
+    ports:
+      - "127.0.0.1:7860:7860"
+    environment:
+      PALIMPSEST_DEMO_ONLY: "0"
+      PALIMPSEST_DATA: /tmp/palimpsest
+    volumes:
+      - case_data:/tmp/palimpsest
+    init: true
+
+volumes:
+  case_data:
