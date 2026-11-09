@@ -6,7 +6,7 @@ import fitz
 import pikepdf
 
 from ..pipeline.evidence import MANIPULATION, finding, location
-from ..pipeline.ocr import pdf_open
+from ..pipeline.ocr import bounds, joined, lines, pdf_open, pdf_tokens
 
 END = re.compile(rb"startxref\s+(\d+)\s+%%EOF(?=\s|$)")
 
@@ -34,18 +34,16 @@ def compare(raw, current, doc):
         with pdf_open(prefix) as before:
             changes = []
             for page_number, (old, new) in enumerate(zip(before, current), 1):
-                old_lines = [line for line in old.get_text().splitlines() if line.strip()][:1000]
-                new_lines = [line for line in new.get_text().splitlines() if line.strip()][:1000]
+                old_groups = lines(pdf_tokens(old), .028)[:1000]
+                new_groups = lines(pdf_tokens(new), .028)[:1000]
+                old_lines = [joined(group) for group in old_groups]
+                new_lines = [joined(group) for group in new_groups]
                 matcher = SequenceMatcher(a=old_lines, b=new_lines, autojunk=True)
                 for operation, i, j, k, l in matcher.get_opcodes():
                     if operation == "equal" or len(changes) >= 12:
                         continue
                     prior, present = " / ".join(old_lines[i:j])[:220], " / ".join(new_lines[k:l])[:220]
-                    search = new.search_for(new_lines[k]) if k < l else []
-                    box = None
-                    if search:
-                        rect = search[0] * new.rotation_matrix
-                        box = [rect.x0 / new.rect.width, rect.y0 / new.rect.height, rect.x1 / new.rect.width, rect.y1 / new.rect.height]
+                    box = bounds([token for group in new_groups[k:l] for token in group]) if k < l else None
                     changes.append({"before": prior, "current": present, "page": page_number, "bbox": box, "revision": index})
             records.append({"revision": index, "metadata": before.metadata, "pages": len(before), "changes": changes})
     if records and records[-1]["changes"]:
