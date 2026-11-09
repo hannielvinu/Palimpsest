@@ -3,7 +3,6 @@ import argparse
 import json
 from time import monotonic, sleep
 from urllib.request import Request, urlopen
-from urllib.error import URLError
 
 
 def smoke(base):
@@ -51,7 +50,7 @@ if __name__ == "__main__":
             with urlopen(args.url.rstrip("/")+"/healthz", timeout=3) as response:
                 if json.load(response).get("status") == "ok":
                     break
-        except (ValueError, URLError, TimeoutError):
+        except (ValueError, OSError):
             sleep(2)
     else:
         raise RuntimeError("Health endpoint did not become ready.")
