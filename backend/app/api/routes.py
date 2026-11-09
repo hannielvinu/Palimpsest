@@ -1,9 +1,11 @@
 from functools import lru_cache
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import subprocess
 import sys
 from threading import BoundedSemaphore
+from typing import Literal
 from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request, Response
@@ -159,6 +161,11 @@ def sample(name: str, tasks: BackgroundTasks):
         raise HTTPException(429, "The desk is busy. Try again shortly.")
     try:
         with db(write=True) as conn:
+            if DEMO_ONLY:
+                cutoff = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat(timespec="milliseconds")
+                conn.execute("DELETE FROM cases WHERE created < ? AND state != 'processing'", (cutoff,))
+                if conn.execute("SELECT count(*) FROM cases").fetchone()[0] >= 200:
+                    raise HTTPException(429, "The demo desk is at capacity. Try again later.")
             case_id = insert_case(conn, SAMPLES[name])
             for file_name, mime, raw in files:
                 insert_upload(conn, case_id, file_name, mime, raw)
@@ -207,7 +214,7 @@ def crossmatrix(case_id: str):
 
 
 @router.get("/documents/{document_id}/render")
-def render(document_id: str, page: int = 1, revision: int = 0):
+def render(document_id: str, page: int = 1, revision: int = 0, layer: Literal["source", "ela"] = "source"):
     if not 1 <= page <= MAX_PAGES or not 0 <= revision <= 4:
         raise HTTPException(404, "Page or revision unavailable.")
     with db() as conn:
@@ -216,7 +223,7 @@ def render(document_id: str, page: int = 1, revision: int = 0):
     if not RENDERS.acquire(blocking=False):
         raise HTTPException(429, "The page renderer is busy.")
     try:
-        job = run_worker("render", document_id, str(page), str(revision), timeout=14)
+        job = run_worker("render", document_id, str(page), str(revision), layer, timeout=14)
         if job.returncode or not job.stdout.startswith(b"\x89PNG"):
             raise HTTPException(422, "Cannot determine: this page could not be rendered.")
         return Response(job.stdout, media_type="image/png", headers={"Cache-Control": "no-store"})

@@ -42,3 +42,9 @@ def test_review_flow(tmp_path, monkeypatch):
         sample = client.post("/api/samples/injection/load")
         assert sample.status_code == 202
         assert client.get(f"/api/cases/{sample.json()['id']}/status").json()["state"] == "ready"
+        degraded = client.post("/api/samples/degraded/load").json()["id"]
+        doc = client.get(f"/api/cases/{degraded}/findings").json()["documents"][0]["id"]
+        source = client.get(f"/api/documents/{doc}/render").content
+        heatmap = client.get(f"/api/documents/{doc}/render?layer=ela").content
+        assert source.startswith(b"\x89PNG") and heatmap.startswith(b"\x89PNG")
+        assert heatmap != source

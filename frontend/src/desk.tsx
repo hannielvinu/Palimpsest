@@ -8,12 +8,14 @@ export function Chip({value}: {value: string}) {
   return <span className={`chip ${style}`}>{icon} {value.replaceAll('_',' ')}</span>
 }
 
-function Render({doc, page, revision, overlays, zoom}: {doc: Doc; page: number; revision: number; overlays: {box: Box; focus?: boolean; layer: string}[]; zoom: number}) {
-  const url = `/api/documents/${doc.id}/render?page=${page}&revision=${revision}`
+function Render({doc, page, revision, overlays, zoom, heatmap=false}: {doc: Doc; page: number; revision: number; overlays: {box: Box; focus?: boolean; layer: string}[]; zoom: number; heatmap?: boolean}) {
+  const url = `/api/documents/${doc.id}/render?page=${page}&revision=${revision}&layer=${heatmap?'ela':'source'}`
   const [failed, setFailed] = useState('')
+  const [loaded, setLoaded] = useState('')
   if (failed === url) return <p className="paper-error">Cannot determine. This page could not be rendered.</p>
-  return <div className="paper" style={{width:`${zoom}%`}}>
-    <img src={url} alt={`${doc.type}, page ${page}, ${revision ? 'prior revision' : 'current file'}`} onError={() => setFailed(url)} />
+  return <div className="paper" aria-busy={loaded !== url} style={{width:`${zoom}%`}}>
+    {loaded !== url && <p className="paper-error" role="status">Rendering page…</p>}
+    <img src={url} alt={`${doc.type}, page ${page}, ${heatmap ? 'recompression heatmap' : revision ? 'prior revision' : 'current file'}`} onLoad={() => setLoaded(url)} onError={() => setFailed(url)} />
     {overlays.map(({box:[x,y,x1,y1],focus,layer}, i) => <span aria-hidden="true" key={i} className={`box ${layer} ${focus ? 'focus' : ''}`}
       style={{left:`${x*100}%`,top:`${y*100}%`,width:Math.max(0,x1-x)*100+'%',height:Math.max(0,y1-y)*100+'%'}} />)}
   </div>
@@ -26,6 +28,7 @@ export function Viewer({doc, result, target, setTarget}: {doc: Doc; result: Resu
   const [zoom, setZoom] = useState(100)
   const [enabled, setEnabled] = useState(new Set(['visual','signature','hidden']))
   const [peel, setPeel] = useState(0)
+  const [heatmap, setHeatmap] = useState(false)
   const revision = doc.revisions.find(r => r.revision === peel)
   const changes = revision?.changes.filter(c => c.page === page) || []
   const overlays: {box: Box; focus?: boolean; layer: string}[] = []
@@ -40,14 +43,16 @@ export function Viewer({doc, result, target, setTarget}: {doc: Doc; result: Resu
       {doc.pages > 1 && <select aria-label="Page" value={page} onChange={e => setTarget({document_id:doc.id,page:Number(e.target.value)})}>
         {Array.from({length:doc.pages},(_,i) => <option key={i} value={i+1}>Page {i+1}</option>)}</select>}
       {!!doc.revisions.length && <button className={peel ? 'peel active' : 'peel'} aria-pressed={!!peel} onClick={() => setPeel(peel ? 0 : doc.revisions.at(-1)!.revision)}>◫ Peel layer</button>}
+      {doc.mime === 'image/jpeg' && <button className="peel" aria-pressed={heatmap} onClick={() => setHeatmap(!heatmap)}>ELA heatmap</button>}
     </div>
     {peel > 0 && <div className="peel-controls"><label>Revision <select value={peel} onChange={e => setPeel(Number(e.target.value))}>
       {doc.revisions.map(r => <option key={r.revision} value={r.revision}>Prior revision {r.revision}</option>)}</select></label>
       {changes.map((change, i) => <div className="revision-values" key={i}><span><small>PRIOR TEXT</small>{change.before || '—'}</span><span><small>CURRENT TEXT</small>{change.current || '—'}</span></div>)}
     </div>}
+    {heatmap && <p className="heatmap-note">Brighter areas show larger recompression residuals. This is a weak signal.</p>}
     <div className={`raster ${peel ? 'split' : ''}`}>
       {peel > 0 && <div><span className="raster-tag">Prior revision</span><Render doc={doc} page={page} revision={peel} overlays={[]} zoom={zoom}/></div>}
-      <div>{peel > 0 && <span className="raster-tag">Current file</span>}<Render doc={doc} page={page} revision={0} overlays={overlays} zoom={zoom}/></div>
+      <div>{peel > 0 && <span className="raster-tag">Current file</span>}<Render doc={doc} page={page} revision={0} overlays={overlays} zoom={zoom} heatmap={heatmap}/></div>
     </div>
     <fieldset className="layers"><legend>Overlay layers</legend>{layers.map(([key,title]) =>
       <label key={key}><input type="checkbox" checked={enabled.has(key)} onChange={() => setEnabled(prev => {

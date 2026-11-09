@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Chain, Decision, Location, Result } from './types'
 import { api, label, post } from './types'
 import { Chip } from './desk'
@@ -41,6 +41,15 @@ export function Review({result, setDecision}: {result: Result; setDecision: (dec
 }
 
 export function Dossier({result}: {result: Result}) {
+  const [head, setHead] = useState('')
+  const [chainError, setChainError] = useState('')
+  useEffect(() => {
+    const controller = new AbortController()
+    api<Chain>(`/api/audit/verify?case_id=${result.id}`, {signal:controller.signal})
+      .then(chain => {setHead(chain.head);setChainError(chain.valid?'':'Chain verification failed.')})
+      .catch(() => {if (!controller.signal.aborted) setChainError('Could not read the audit-chain head.')})
+    return () => controller.abort()
+  },[result.id,result.decision?.timestamp])
   return <section className="panel wide dossier"><div className="section-head"><small className="eyebrow">CASE FILE</small><h2>Investigation dossier</h2>
     <a className="button primary" href={`/api/cases/${result.id}/dossier.pdf`} download>↓ Download PDF</a></div>
     <h3>Document Overview</h3>{result.documents.map(d => <p key={d.id}>{d.name} · {d.type} · {d.status}<br/><code>{d.sha256}</code></p>)}
@@ -48,7 +57,9 @@ export function Dossier({result}: {result: Result}) {
       {d.fields.length ? <ul>{d.fields.map((f,i) => <li key={i}>{label(f.key)} · {f.value} · p. {f.page} · {f.method}, unverified</li>)}</ul> : <p>No readable fields.</p>}</div>)}
     <h3>Contextual Analysis</h3><ul>{result.findings.filter(f => f.layer==='fields').map(f => <li key={f.id}>{f.id} · {f.summary}</li>)}</ul>
     <h3>Visual Forensic Findings</h3><ul>{result.findings.filter(f => f.layer!=='fields').map(f => <li key={f.id}>{f.id} · {f.summary}</li>)}</ul>
-    <h3>Evidence and Traceability</h3><p>Case <code>{result.id}</code>. Verify the chain head in Audit trail. The PDF records the head at export.</p>
+    <h3>Evidence and Traceability</h3><p>Case <code>{result.id}</code></p>
+    {head && <p>Audit-chain head <code>{head}</code></p>}
+    {chainError && <p role="alert" className="error">{chainError}</p>}
     {result.findings.map(f => <details key={f.id}><summary>{f.id} · {f.summary}</summary><p>Page {f.page} · {f.method}</p><p>{f.limits}</p><p>{f.explanation.settle}</p></details>)}
     <h3>Investigation Summary</h3><p><Chip value={result.summary.concern}/> {result.summary.score} concern points</p>
     <p>{result.summary.formula}</p><p>{result.decision ? `${result.decision.action} · ${result.decision.timestamp} · ${result.decision.reason}` : 'Human decision pending.'}</p>

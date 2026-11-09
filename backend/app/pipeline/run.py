@@ -18,8 +18,12 @@ from .ocr import image_open, joined, lines, ocr_tokens, pdf_open, pdf_tokens, ra
 cv2.setNumThreads(1)
 
 
-def render(raw, mime, page=1, revision=0):
-    if mime == "application/pdf":
+def render(raw, mime, page=1, revision=0, layer="source"):
+    if layer == "ela":
+        if mime != "image/jpeg" or page != 1 or revision:
+            raise ValueError("ELA heatmap requires a current JPEG page")
+        im = ela.heatmap(image_open(raw))
+    elif mime == "application/pdf":
         if revision:
             versions = layer_peel.revisions(raw)
             if not 1 <= revision <= len(versions):
@@ -51,7 +55,7 @@ def read_pages(raw, mime, doc):
                 method = "Embedded text"
                 tokens = [token for token in tokens if not any(
                     box[0] <= (token["bbox"][0] + token["bbox"][2]) / 2 <= box[2]
-                    and box[1] <= token["base"] <= box[3] for box in hidden
+                    and box[1] <= (token["bbox"][1] + token["bbox"][3]) / 2 <= box[3] for box in hidden
                 )]
                 if len(tokens) < 6:
                     im = raster(page)
@@ -128,8 +132,7 @@ def analyze(records, report=lambda *_: None):
                 evidence.extend(font_baseline.inspect(doc, None, [t for g in groups for t in g], image, 1))
                 evidence.extend(copy_move.inspect(image, doc, 1))
                 if doc["mime"] == "image/jpeg":
-                    ela_findings, _ = ela.inspect(image, doc, 1)
-                    evidence.extend(ela_findings)
+                    evidence.extend(ela.inspect(image, doc, 1))
         except (RuntimeError, ValueError, OSError):
             doc.update(status="Cannot determine", reason="A page could not be rendered for visual inspection.")
             evidence.append(finding("quality", OBSERVED, doc["reason"], location(doc), method="Bounded page renderer",

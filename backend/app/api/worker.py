@@ -29,6 +29,6 @@ if __name__ == "__main__":
     if sys.argv[1] == "render":
         with db() as conn:
             row = conn.execute("SELECT * FROM documents WHERE id=?", (sys.argv[2],)).fetchone()
-        sys.stdout.buffer.write(render(row["original"], row["mime"], int(sys.argv[3]), int(sys.argv[4])))
+        sys.stdout.buffer.write(render(row["original"], row["mime"], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5]))
     else:
         job(sys.argv[1])
