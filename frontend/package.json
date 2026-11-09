@@ -1,0 +1,9 @@
+{
+  "name": "palimpsest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {"dev": "vite", "check": "tsc --noEmit", "build": "tsc --noEmit && vite build"},
+  "dependencies": {"react": "^19", "react-dom": "^19"},
+  "devDependencies": {"@types/react": "^19", "@types/react-dom": "^19", "@vitejs/plugin-react": "^5", "@tailwindcss/vite": "^4", "tailwindcss": "^4", "typescript": "^5.9", "vite": "^7"}
+}
