@@ -45,4 +45,9 @@ python scripts/capture_screens.py --url https://YOUR-ACTUAL-HOST --out .scratch/
 
 The smoke scripts exercise bundled cases, revision recovery, decision, dossier, audit and purge against the supplied URL. Verify the browser and copy the live link to README and the final slide. Pass the verified URL as **--live-url** to **presentation/build.py** to generate the QR. Re-export the PDF and re-upload both deck files after this update.
 
+```sh
+python presentation/build.py --live-url https://YOUR-ACTUAL-HOST
+soffice --headless --convert-to pdf --outdir presentation presentation/Palimpsest.pptx
+```
+
 For a local single-user container, use **docker compose up --build** and open **http://127.0.0.1:7860**. The compose volume retains cases across restarts.
