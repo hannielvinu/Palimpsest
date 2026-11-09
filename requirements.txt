@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-multipart
+PyMuPDF
+pikepdf
+Pillow
+numpy
+opencv-python-headless
+pytesseract
+rapidfuzz
+dateparser
+reportlab

@@ -1,0 +1,7 @@
+-r requirements.txt
+httpx
+pytest
+playwright
+python-pptx
+qrcode
+imageio-ffmpeg
