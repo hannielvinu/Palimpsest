@@ -39,19 +39,23 @@ def inspect(doc, page, tokens, image, number):
         font = ""
         peers = []
         if spans:
-            def font_for(target):
+            def span_for(target):
                 point = target["bbox"][0] * page.rect.width, sum(target["bbox"][1::2]) / 2 * page.rect.height
-                return next((s["font"] for s in spans if s["bbox"][0] - 1 <= point[0] <= s["bbox"][2]
-                             and s["bbox"][1] <= point[1] <= s["bbox"][3]), "")
-            font = font_for(field)
-            peers = [font_for(other) for other in controls]
+                return next((s for s in spans if s["bbox"][0] - 1 <= point[0] <= s["bbox"][2]
+                             and s["bbox"][1] <= point[1] <= s["bbox"][3]), None)
+            field_span = span_for(field)
+            label_span = span_for(label) if label else None
+            if field_span and label_span:
+                baseline_delta = abs(field_span["origin"][1] - label_span["origin"][1]) / page.rect.height
+            font = field_span["font"] if field_span else ""
+            peers = [(span_for(other) or {}).get("font", "") for other in controls]
         stroke, sharpness = stroke_proxy(gray, field["bbox"])
         peer_metrics = [stroke_proxy(gray, other["bbox"]) for other in controls]
         baseline_diff = baseline_delta > .004
         font_diff = bool(font and all(peer and peer != font for peer in peers))
         if typical > 0 and height / typical >= 1.22 and (font_diff or (baseline_diff and field["method"] == "OCR" and stroke > 1.2 * median(p[0] for p in peer_metrics))):
             results.append(finding("font_baseline", MANIPULATION, "Amount typography differs from neighboring amounts.",
-                                   field, method="Relative word height, PDF font, bottom alignment and raster stroke/edge statistics",
+                                   field, method="Relative word height, PDF font and baseline or OCR bottom alignment, raster stroke/edge statistics",
                                    limits="Mixed typography, OCR boxes and scan blur can change these measures.",
                                    confidence=.87 if font_diff else .65,
                                    values={"value": field["value"], "font": font, "peer_fonts": peers,

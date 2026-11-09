@@ -58,6 +58,9 @@ def test_ravi_findings(samples):
     assert "48,000" in change["before"] and "88,000" in change["current"]
     assert by_detector["layer_peel"][0]["bbox"] is not None
     assert by_detector["signature_reuse"][0]["related"]
+    typography = by_detector["font_baseline"][0]["values"]
+    assert typography["baseline_offset"] > .005
+    assert typography["sharpness"] != typography["peer_sharpness"]
     assert len(revisions((SAMPLES / "ravi_case" / "01-salary-slip.pdf").read_bytes())) == 1
 
 
