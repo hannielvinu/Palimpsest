@@ -1,7 +1,7 @@
 -r requirements.txt
-httpx
-pytest
-playwright
-python-pptx
-qrcode
-imageio-ffmpeg
+httpx==0.28.1
+pytest==9.2.0
+playwright==1.64.1
+python-pptx==1.0.2
+qrcode==8.2
+imageio-ffmpeg==0.8.1
