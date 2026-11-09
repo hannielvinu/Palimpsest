@@ -52,7 +52,7 @@ def document(path, title, rows, seed=0, signed=False, edit=None, hidden=False):
             page.add_redact_annot(rect, fill=(1, 1, 1), cross_out=False)
             page.apply_redactions()
             page.insert_text((254, y - 4), new, fontsize=21, fontname="cobo", color=(.10, .12, .20))
-            pdf.saveIncr()
+            pdf.save(path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP, no_new_id=True)
 
 
 def make_pair(folder, *, name, alias=None, seed=42, net=48000, edit=None, slip_net=None, bank_net=None,
