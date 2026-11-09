@@ -11,14 +11,14 @@
       "condition": "blur",
       "total": 5,
       "flagged": 0,
-      "cannot_determine": 0,
+      "cannot_determine": 4,
       "rate": 0.0
     },
     {
       "condition": "rotation",
       "total": 5,
       "flagged": 1,
-      "cannot_determine": 0,
+      "cannot_determine": 1,
       "rate": 0.2
     },
     {

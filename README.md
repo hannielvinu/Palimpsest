@@ -116,7 +116,7 @@ flowchart LR
 | Method | How it works | Known limit |
 |---|---|---|
 | Amount typography | Compares height, PDF font, alignment and raster stroke/edge statistics across money fields. | Mixed templates, scan blur and sparse fields affect the signal. |
-| ELA | Recompresses a JPEG and measures local residual peaks. | Recompression and natural edges can affect the result. |
+| ELA | Recompresses a JPEG, measures local residual peaks, and offers a heatmap in the viewer. | Recompression and natural edges can affect the result. |
 | Copy-move | Groups ORB feature matches under common translation. | Repeated template art can match. Rotation and low texture can hide duplicates. |
 | Signature reuse | Crops labeled PDF signature regions and compares normalized ink with SSIM. | Shared approved stamps may look identical. |
 | Layer peel | Validates prior xref/EOF boundaries with pikepdf and diffs page text. | Flattened history cannot be recovered. Graphic-only edits may be missed. |
@@ -131,13 +131,13 @@ flowchart LR
 |---:|---:|---:|---:|
 | 20 | 9 | 1 | 0 / 10 |
 
-| Genuine scan condition | False alarms |
-|---|---:|
-| Clean raster | 0 / 5 |
-| Blur | 0 / 5 |
-| Rotation | 1 / 5 |
-| JPEG compression | 0 / 5 |
-| Noise | 0 / 5 |
+| Genuine scan condition | False alarms | Cannot determine |
+|---|---:|---:|
+| Clean raster | 0 / 5 | 0 |
+| Blur | 0 / 5 | 4 |
+| Rotation | 1 / 5 | 1 |
+| JPEG compression | 0 / 5 | 0 |
+| Noise | 0 / 5 | 0 |
 
 [Per-detector results](data/benchmark/results/benchmark.md) · [Robustness results](data/benchmark/results/robustness.md) · [Case-level JSON](data/benchmark/results/benchmark.json)
 
@@ -241,7 +241,7 @@ Health is available at **/healthz** and OpenAPI at **/docs**.
 | `POST /api/cases/{id}/analyze` | Queue analysis. |
 | `GET /api/cases/{id}/status` | Poll steps, state and timings. |
 | `GET /api/cases/{id}/findings` | Read case fields, evidence and concern. |
-| `GET /api/documents/{id}/render?page=1&revision=0` | Render a current or retained PDF page. |
+| `GET /api/documents/{id}/render?page=1&revision=0&layer=source` | Render the source or retained PDF page. Use `layer=ela` for a JPEG heatmap. |
 | `GET /api/cases/{id}/crossmatrix` | Compare fields across documents. |
 | `POST /api/cases/{id}/decision` | Record JSON action and reason. |
 | `GET /api/cases/{id}/dossier.pdf` | Export the investigation PDF. |

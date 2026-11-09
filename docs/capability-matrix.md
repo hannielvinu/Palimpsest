@@ -7,7 +7,7 @@
 | Document classification and field extraction | Partial | English labeled templates and keyword scoring. Free-form layouts and unlabeled rows can fail. |
 | Field relationships and cross-document matching | Partial | Payroll, date order, age, formats, and identity rules. Initials and common variations supported. |
 | Font, baseline and sharpness | Partial | Neighboring money fields with PDF typography and raster proxies. |
-| ELA and copy-move | Partial | Compression residual and ORB translation heuristics on raster uploads. |
+| ELA and copy-move | Partial | JPEG recompression heatmap and ORB translation heuristics on raster uploads. No positive-case hit rate in the initial benchmark. |
 | Signature reuse | Partial | Labeled PDF signatures compared with SSIM. Shared stamps are a benign explanation. |
 | Retained PDF history | Implemented | Up to four earlier validated revisions, page text diff and side-by-side renders. |
 | Hidden instruction | Partial | PDF visibility and English pattern rules. Extracted text never controls the workflow. |

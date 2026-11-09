@@ -36,7 +36,7 @@ Ingest validates MIME against file content and stores the exact original bytes p
 ## Security model
 
 - Local mode is a single-user workstation. Its bind address defaults to loopback in the quickstart. This build has no user authentication or tenant separation.
-- Public mode accepts bundled synthetic fixtures only. Case identifiers are random capability-like identifiers. Possession of an identifier provides access to that case. Run public demos with ephemeral storage.
+- Public mode accepts bundled synthetic fixtures only and caps the store at 200 cases. Loading a bundled case clears completed demo cases older than an hour. Case identifiers are random capability-like identifiers. Possession of an identifier provides access to that case. Run public demos with ephemeral storage.
 - Uploads allow PDF, PNG and JPEG only, match extension to magic or decoded image format, sanitize display names, cap document count, file bytes, page count and pixels, and use SQLite BLOBs with no user-derived filesystem paths.
 - Workers use time limits for OCR, analysis and page rendering. Native parsing remains in the same operating-system account. An OS sandbox, upstream rate limits and stronger resource isolation are future work.
 - The PDF viewer only displays rendered pixels and React-escaped strings. It never executes PDF actions or embeds a raw upload. Hidden instruction text is treated as evidence and excluded from field extraction.
