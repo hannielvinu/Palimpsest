@@ -173,7 +173,7 @@ def sample(name: str, tasks: BackgroundTasks):
 @lru_cache(maxsize=4)
 def sample_inputs(name):
     records = []
-    for file in sorted((ROOT / "data" / "samples" / f"{name}_case").iterdir()):
+    for file in sorted((ROOT / "data" / "samples" / f"{name}_case").glob("*")):
         if file.is_file() and file.suffix.lower() in {".pdf", ".png", ".jpg"}:
             raw = file.read_bytes()
             records.append((*inspect_upload(file.name, raw), raw))

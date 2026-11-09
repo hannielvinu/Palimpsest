@@ -49,13 +49,15 @@ def read_pages(raw, mime, doc):
                 tokens = pdf_tokens(page)
                 im = None
                 method = "Embedded text"
-                if len(tokens) < 6 and not hidden:
+                tokens = [token for token in tokens if not any(
+                    box[0] <= (token["bbox"][0] + token["bbox"][2]) / 2 <= box[2]
+                    and box[1] <= token["base"] <= box[3] for box in hidden
+                )]
+                if len(tokens) < 6:
                     im = raster(page)
                     tokens = ocr_tokens(im)
                     method = "OCR"
-                groups = [group for group in lines(tokens, .028) if not any(
-                    joined(group) in content or content in joined(group) for content in hidden)]
-                pages.append((groups, method, im, flagged))
+                pages.append((lines(tokens, .028), method, im, flagged))
     else:
         im = image_open(raw)
         pages.append((lines(ocr_tokens(im)), "OCR", im, []))
@@ -101,6 +103,8 @@ def analyze(records, report=lambda *_: None):
                     reason = "Scan blur was observed; extracted text is unverified."
                 evidence.append(finding("quality", OBSERVED, reason, location(doc, number), method="OCR and raster edge energy",
                                         limits="Blur measurements depend on scan scale and content.", confidence=.73, layer="fields"))
+        if doc["status"] == "Ready" and (doc["type"] == "Unknown" or not doc["fields"]):
+            doc.update(status="Cannot determine", reason="The layout or field labels could not be interpreted reliably.")
         if doc["status"] == "Cannot determine":
             evidence.append(finding("quality", OBSERVED, doc["reason"], location(doc), method="Parser and OCR readability gate",
                                     limits="A higher-quality source may allow analysis.", confidence=1, layer="fields"))
