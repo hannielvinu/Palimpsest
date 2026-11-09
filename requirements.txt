@@ -10,3 +10,4 @@ pytesseract
 rapidfuzz
 dateparser
 reportlab
+scikit-image
