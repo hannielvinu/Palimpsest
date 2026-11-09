@@ -1,0 +1,25 @@
+name: Verify application
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build application container
+        run: docker build -t palimpsest-check .
+      - name: Start container and verify all samples
+        run: |
+          docker run -d --name palimpsest -p 127.0.0.1:7860:7860 palimpsest-check
+          python3 scripts/smoke_http.py http://127.0.0.1:7860
+      - name: Print container logs
+        if: always()
+        run: docker logs palimpsest || true
